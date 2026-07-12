@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "blebui",
+	"version": "${version}",
+	"name": "BlebUI",
+	"description": "BlebUI mod",
+	"authors": [
+		"Blebik"
+	],
+	"license": "CC0-1.0",
+	"icon": "assets/blebui/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"bleb.ui.BlebUI"
+		],
+		"client": [
+			"bleb.ui.client.BlebUIClient"
+		]
+	},
+	"mixins": [
+		"blebui.mixins.json",
+		{
+			"config": "blebui.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*",
+		"owo": ">=0.12.15",
+		"modmenu": "*"
+	}
+}
