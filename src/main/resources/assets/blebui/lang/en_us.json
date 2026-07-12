@@ -1,0 +1,12 @@
+{
+  "menu.blebui.singleplayer": "Singleplayer",
+  "menu.blebui.multiplayer": "Multiplayer",
+  "menu.blebui.mods": "Mods",
+  "menu.blebui.options": "Options",
+  "menu.blebui.background_config": "Background Settings",
+  "menu.blebui.quit": "Quit game",
+  "menu.blebui.selection_title": "Background Selection",
+  "menu.blebui.previous": "◀ Previous",
+  "menu.blebui.next": "Next ▶",
+  "menu.blebui.frame_rate": "Frame Rate: %s"
+}
