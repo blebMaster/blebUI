@@ -15,11 +15,21 @@ import org.jetbrains.annotations.NotNull;
 public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
     private final Screen parent;
     private LabelComponent themeNameLabel;
-    private FlowLayout previewBox; // Вынесли рамку в поле класса, чтобы иметь к ней доступ из любого метода
+    private FlowLayout previewBox;
+
+    private LabelComponent titleLabel;
+    private LabelComponent prevBtn;
+    private LabelComponent nextBtn;
+    private LabelComponent applyBtn;
+    private LabelComponent backBtn;
+    private SliderComponent fpsSlider;
 
     private final int previewWidth = 200;
     private final int previewHeight = 130;
     private int temporaryFps = BackgroundManager.targetFps;
+
+    private long lastLanguageCheckTime = 0;
+    private String lastLanguageCode = "";
 
     public BackgroundConfigScreen(Screen parent) {
         this.parent = parent;
@@ -36,7 +46,8 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected void build(FlowLayout rootComponent) {
-        LabelComponent titleLabel = Components.label(Component.literal("Background Selection"));
+
+        titleLabel = Components.label(Component.literal(""));
         titleLabel.shadow(true).margins(Insets.bottom(15));
         rootComponent.child(titleLabel);
 
@@ -44,22 +55,21 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         FlowLayout selectorRow = (FlowLayout) Containers.horizontalFlow(Sizing.content(), Sizing.content())
                 .verticalAlignment(VerticalAlignment.CENTER);
 
-        LabelComponent prevBtn = Components.label(Component.literal("◀ Previous"));
+        prevBtn = Components.label(Component.literal(""));
         setupInteractiveText(prevBtn, () -> {
-            BackgroundManager.switchBrowsingTheme(false); // Листаем папки назад
+            BackgroundManager.switchBrowsingTheme(false);
             updateThemeUI();
         });
         prevBtn.margins(Insets.right(25));
 
-
         previewBox = (FlowLayout) Containers.verticalFlow(Sizing.fixed(previewWidth), Sizing.fixed(previewHeight))
                 .horizontalAlignment(HorizontalAlignment.CENTER)
                 .verticalAlignment(VerticalAlignment.CENTER);
-        previewBox.surface(Surface.outline(0xFFFFFFFF)); // Белая рамка
+        previewBox.surface(Surface.outline(0xFFFFFFFF));
 
-        LabelComponent nextBtn = Components.label(Component.literal("Next ▶"));
+        nextBtn = Components.label(Component.literal(""));
         setupInteractiveText(nextBtn, () -> {
-            BackgroundManager.switchBrowsingTheme(true); // Листаем папки вперед
+            BackgroundManager.switchBrowsingTheme(true);
             updateThemeUI();
         });
         nextBtn.margins(Insets.left(25));
@@ -73,50 +83,69 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         rootComponent.child(themeNameLabel);
 
 
-        LabelComponent applyBtn = Components.label(Component.literal("[ APPLY ]"));
+        applyBtn = Components.label(Component.literal(""));
         setupInteractiveText(applyBtn, () -> {
-
             BackgroundManager.applySelectedTheme();
-
-
             BackgroundManager.targetFps = this.temporaryFps;
         });
-        applyBtn.color(Color.ofRgb(0x40E0D0));
         applyBtn.margins(Insets.bottom(25));
         rootComponent.child(applyBtn);
 
 
-
-        SliderComponent fpsSlider = Components.slider(Sizing.fixed(150));
-
-
+        fpsSlider = Components.slider(Sizing.fixed(150));
         double initialProgress = (double) (BackgroundManager.targetFps - 1) / (60 - 1);
         fpsSlider.value(initialProgress);
-        fpsSlider.message(value -> Component.literal("Frame Rate: " + this.temporaryFps));
 
         fpsSlider.onChanged().subscribe(newValue -> {
             int scaledFps = 1 + (int) Math.round(newValue * (60 - 1));
             this.temporaryFps = scaledFps;
-
-
-            fpsSlider.message(value -> Component.literal("Frame Rate: " + scaledFps));
+            boolean isRussian = Minecraft.getInstance().options.languageCode.equalsIgnoreCase("ru_ru");
+            fpsSlider.message(value -> Component.literal((isRussian ? "Скорость кадров: " : "Frame Rate: ") + scaledFps));
         });
         rootComponent.child(fpsSlider);
 
 
-        LabelComponent backBtn = Components.label(Component.literal("◀ Back"));
+        backBtn = Components.label(Component.literal(""));
         setupInteractiveText(backBtn, () -> Minecraft.getInstance().setScreen(this.parent));
         backBtn.positioning(Positioning.absolute(20, this.height - 30));
         rootComponent.child(backBtn);
 
         refreshPreviewImage();
+        this.lastLanguageCode = Minecraft.getInstance().options.languageCode;
+        updateTranslations();
+    }
+    private void updateTranslations() {
+        boolean isRussian = this.lastLanguageCode.equalsIgnoreCase("ru_ru");
+
+        if (titleLabel != null) titleLabel.text(Component.literal(isRussian ? "Настройка фонов" : "Background Selection"));
+        if (prevBtn != null) prevBtn.text(Component.literal(isRussian ? "◀ Назад" : "◀ Previous"));
+        if (nextBtn != null) nextBtn.text(Component.literal(isRussian ? "Вперед ▶" : "Next ▶"));
+        if (applyBtn != null) applyBtn.text(Component.literal(isRussian ? "[ ПРИМЕНИТЬ ]" : "[ APPLY ]"));
+        if (backBtn != null) backBtn.text(Component.literal(isRussian ? "◀ Назад" : "◀ Back"));
+        if (fpsSlider != null) fpsSlider.message(value -> Component.literal((isRussian ? "Скорость кадров: " : "Frame Rate: ") + this.temporaryFps));
+        if (applyBtn != null) applyBtn.color(Color.ofRgb(0x40E0D0));
+    }
+
+    @Override
+    public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - lastLanguageCheckTime >= 3000) {
+            String currentLang = Minecraft.getInstance().options.languageCode;
+            if (!currentLang.equalsIgnoreCase(this.lastLanguageCode)) {
+                this.lastLanguageCode = currentLang;
+                updateTranslations();
+                System.out.println("[BlebUI] Экран настроек зафиксировал смену языка на " + currentLang);
+            }
+            lastLanguageCheckTime = currentTime;
+        }
+
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     private void refreshPreviewImage() {
         if (previewBox == null) return;
-
         previewBox.clearChildren();
-
         if (BackgroundManager.isPreviewLoaded) {
             previewBox.child(Components.texture(
                     BackgroundManager.PREVIEW_TEXTURE, 0, 0, previewWidth, previewHeight, previewWidth, previewHeight
@@ -139,12 +168,19 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         });
         label.mouseEnter().subscribe(() -> label.color(Color.ofRgb(0x40E0D0)));
         label.mouseLeave().subscribe(() -> {
-            if (label.text().getString().contains("APPLY")) {
+            String text = label.text().getString();
+            if (text.contains("APPLY") || text.contains("ПРИМЕНИТЬ")) {
                 label.color(Color.ofRgb(0x40E0D0));
             } else {
                 label.color(Color.ofRgb(0xFFFFFF));
             }
         });
+    }
+
+    @Override
+    public void removed() {
+        super.removed();
+        BackgroundManager.saveConfig();
     }
 
     @Override
@@ -158,11 +194,5 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         } else {
             this.renderTransparentBackground(guiGraphics);
         }
-    }
-
-    @Override
-    public void removed() {
-        super.removed();
-        BackgroundManager.saveConfig();
     }
 }

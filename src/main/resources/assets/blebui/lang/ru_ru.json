@@ -1,0 +1,12 @@
+{
+  "menu.blebui.singleplayer": "Одиночная игра",
+  "menu.blebui.multiplayer": "Сетевая игра",
+  "menu.blebui.mods": "Моды",
+  "menu.blebui.options": "Настройки",
+  "menu.blebui.background_config": "Настройки фона",
+  "menu.blebui.quit": "Выход",
+  "menu.blebui.selection_title": "Настройка фонов",
+  "menu.blebui.previous": "◀ Назад",
+  "menu.blebui.next": "Вперед ▶",
+  "menu.blebui.frame_rate": "Скорость кадров: %s"
+}

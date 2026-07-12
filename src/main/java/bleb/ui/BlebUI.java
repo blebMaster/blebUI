@@ -9,11 +9,9 @@ import org.slf4j.LoggerFactory;
 
 public class BlebUI implements ModInitializer {
 	public static final String MOD_ID = "blebui";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Hello Fabric world!");
 	}
 
 	public static ResourceLocation id(String path) {

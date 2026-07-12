@@ -12,6 +12,17 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
+    private LabelComponent singleplayerBtn;
+    private LabelComponent multiplayerBtn;
+    private LabelComponent modsBtn;
+    private LabelComponent optionsBtn;
+    private LabelComponent configBtn;
+    private LabelComponent quitBtn;
+    private LabelComponent titleLabel;
+    private LabelComponent versionLabel;
+
+    private long lastLanguageCheckTime = 0;
+    private String lastLanguageCode = "";
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -31,7 +42,7 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
         topBar.surface(Surface.flat(0x55000000));
         topBar.padding(Insets.horizontal(15));
 
-        LabelComponent singleplayerBtn = createCustomButton("Одиночная игра", () -> {
+        singleplayerBtn = createCustomButton("", () -> {
             try {
                 net.minecraft.client.gui.screens.Screen spScreen =
                         (net.minecraft.client.gui.screens.Screen) Class.forName("net.minecraft.client.gui.screens.worldselection.SelectWorldScreen")
@@ -39,11 +50,11 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
                                 .newInstance(this);
                 Minecraft.getInstance().setScreen(spScreen);
             } catch (Exception e) {
-                System.out.println("[BlebUI] Ошибка открытия Одиночной игры: " + e.getMessage());
+                System.out.println("[BlebUI] Ошибка: " + e.getMessage());
             }
         });
 
-        LabelComponent multiplayerBtn = createCustomButton("Сетевая игра", () -> {
+        multiplayerBtn = createCustomButton("", () -> {
             try {
                 net.minecraft.client.gui.screens.Screen mpScreen =
                         (net.minecraft.client.gui.screens.Screen) Class.forName("net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen")
@@ -51,11 +62,11 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
                                 .newInstance(this);
                 Minecraft.getInstance().setScreen(mpScreen);
             } catch (Exception e) {
-                System.out.println("[BlebUI] Ошибка открытия Сетевой игры: " + e.getMessage());
+                System.out.println("[BlebUI] Ошибка: " + e.getMessage());
             }
         });
 
-        LabelComponent modsBtn = createCustomButton("Моды", () -> {
+        modsBtn = createCustomButton("", () -> {
             try {
                 net.minecraft.client.gui.screens.Screen modsScreen =
                         (net.minecraft.client.gui.screens.Screen) Class.forName("com.terraformersmc.modmenu.gui.ModsScreen")
@@ -63,19 +74,19 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
                                 .newInstance(this);
                 Minecraft.getInstance().setScreen(modsScreen);
             } catch (Throwable e) {
-                System.out.println("[BlebUI] Не удалось запустить ModsScreen: " + e.getMessage());
+                System.out.println("[BlebUI] Ошибка: " + e.getMessage());
             }
         });
 
-        LabelComponent optionsBtn = createCustomButton("Настройки", () ->
+        optionsBtn = createCustomButton("", () ->
                 Minecraft.getInstance().setScreen(new OptionsScreen(this, Minecraft.getInstance().options))
         );
 
-        LabelComponent configBtn = createCustomButton("Настройки фона", () ->
+        configBtn = createCustomButton("", () ->
                 Minecraft.getInstance().setScreen(new BackgroundConfigScreen(this))
         );
 
-        LabelComponent quitBtn = createCustomButton("Выход", () ->
+        quitBtn = createCustomButton("", () ->
                 Minecraft.getInstance().close()
         );
 
@@ -86,36 +97,59 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
         topBar.child(configBtn.margins(Insets.horizontal(10)));
         topBar.child(quitBtn.margins(Insets.horizontal(10)));
 
-        LabelComponent titleLabel = Components.label(Component.literal("BlebikUI"));
+        titleLabel = Components.label(Component.literal("BlebikUI"));
         titleLabel.shadow(true).color(Color.ofRgb(0xaaaaaa));
-
         titleLabel.positioning(Positioning.absolute(12, this.height - 20));
 
-        LabelComponent versionLabel = Components.label(Component.literal("v1.0.1"));
+        versionLabel = Components.label(Component.literal("v1.0.0"));
         versionLabel.shadow(true).color(Color.ofRgb(0x555555));
-
         versionLabel.positioning(Positioning.absolute(this.width - 45, this.height - 20));
 
         rootComponent.child(topBar);
         rootComponent.child(titleLabel);
         rootComponent.child(versionLabel);
+
+        this.lastLanguageCode = Minecraft.getInstance().options.languageCode;
+        updateButtonTranslations();
     }
 
+    private void updateButtonTranslations() {
+        boolean isRussian = this.lastLanguageCode.equalsIgnoreCase("ru_ru");
 
+        if (singleplayerBtn != null) singleplayerBtn.text(Component.literal(isRussian ? "Одиночная игра" : "Singleplayer"));
+        if (multiplayerBtn != null) multiplayerBtn.text(Component.literal(isRussian ? "Сетевая игра" : "Multiplayer"));
+        if (modsBtn != null) modsBtn.text(Component.literal(isRussian ? "Моды" : "Mods"));
+        if (optionsBtn != null) optionsBtn.text(Component.literal(isRussian ? "Настройки" : "Options"));
+        if (configBtn != null) configBtn.text(Component.literal(isRussian ? "Настройки фона" : "Background Settings"));
+        if (quitBtn != null) quitBtn.text(Component.literal(isRussian ? "Выход" : "Quit game"));
+    }
+
+    @Override
+    public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastLanguageCheckTime >= 3000) {
+            String currentLang = Minecraft.getInstance().options.languageCode;
+            if (!currentLang.equalsIgnoreCase(this.lastLanguageCode)) {
+                this.lastLanguageCode = currentLang;
+                updateButtonTranslations();
+                System.out.println("[BlebUI] Язык изменился на " + currentLang + ". Текст главного меню обновлен.");
+            }
+            lastLanguageCheckTime = currentTime;
+        }
+
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
 
     private LabelComponent createCustomButton(String text, Runnable onClick) {
         LabelComponent label = Components.label(Component.literal(text));
-        label.shadow(true);
-        label.cursorStyle(CursorStyle.HAND);
+        label.shadow(true).cursorStyle(CursorStyle.HAND);
 
         label.mouseDown().subscribe((mouseX, mouseY, button) -> {
             onClick.run();
             return true;
         });
-
         label.mouseEnter().subscribe(() -> label.color(Color.ofRgb(0x40E0D0)));
         label.mouseLeave().subscribe(() -> label.color(Color.ofRgb(0xFFFFFF)));
-
         return label;
     }
 
