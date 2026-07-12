@@ -4,7 +4,7 @@
 
 # BlebikUI 🚀
 
-An incredibly fast, lightweight, and highly optimized Fabric mod for customizing your Minecraft 1.21.1 main menu. It replaces the default panorama with a modern top-bar interface and support for dynamic animated or static backgrounds.
+Fabric mod for customizing your Minecraft 1.21.1 main menu. It replaces the default panorama with a top-bar interface and support for dynamic animated or static backgrounds.
 
 ---
 
