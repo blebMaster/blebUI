@@ -52,7 +52,6 @@ BlebikUI treats folders inside `backgrounds` as individual theme packs. To make 
 * Minecraft `1.21.1`
 * Fabric Loader
 * Fabric API
-* oωo-lib
 * Mod Menu
 
 ## License
