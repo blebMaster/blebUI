@@ -41,29 +41,12 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
 
         topBar.surface(Surface.flat(0x55000000));
         topBar.padding(Insets.horizontal(15));
-
         singleplayerBtn = createCustomButton("", () -> {
-            try {
-                net.minecraft.client.gui.screens.Screen spScreen =
-                        (net.minecraft.client.gui.screens.Screen) Class.forName("net.minecraft.client.gui.screens.worldselection.SelectWorldScreen")
-                                .getConstructor(net.minecraft.client.gui.screens.Screen.class)
-                                .newInstance(this);
-                Minecraft.getInstance().setScreen(spScreen);
-            } catch (Exception e) {
-                System.out.println("[BlebUI] Ошибка: " + e.getMessage());
-            }
+            Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.worldselection.SelectWorldScreen(this));
         });
 
         multiplayerBtn = createCustomButton("", () -> {
-            try {
-                net.minecraft.client.gui.screens.Screen mpScreen =
-                        (net.minecraft.client.gui.screens.Screen) Class.forName("net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen")
-                                .getConstructor(net.minecraft.client.gui.screens.Screen.class)
-                                .newInstance(this);
-                Minecraft.getInstance().setScreen(mpScreen);
-            } catch (Exception e) {
-                System.out.println("[BlebUI] Ошибка: " + e.getMessage());
-            }
+            Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(this));
         });
 
         modsBtn = createCustomButton("", () -> {
@@ -101,7 +84,7 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
         titleLabel.shadow(true).color(Color.ofRgb(0xaaaaaa));
         titleLabel.positioning(Positioning.absolute(12, this.height - 20));
 
-        versionLabel = Components.label(Component.literal("v1.0.3"));
+        versionLabel = Components.label(Component.literal("v1.0.4"));
         versionLabel.shadow(true).color(Color.ofRgb(0x555555));
         versionLabel.positioning(Positioning.absolute(this.width - 45, this.height - 20));
 
