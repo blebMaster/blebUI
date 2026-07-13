@@ -46,11 +46,9 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected void build(FlowLayout rootComponent) {
-
         titleLabel = Components.label(Component.literal(""));
         titleLabel.shadow(true).margins(Insets.bottom(15));
         rootComponent.child(titleLabel);
-
 
         FlowLayout selectorRow = (FlowLayout) Containers.horizontalFlow(Sizing.content(), Sizing.content())
                 .verticalAlignment(VerticalAlignment.CENTER);
@@ -77,11 +75,9 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         selectorRow.child(prevBtn).child(previewBox).child(nextBtn);
         rootComponent.child(selectorRow);
 
-
         themeNameLabel = Components.label(Component.literal(BackgroundManager.getBrowsingThemeName().toUpperCase()));
         themeNameLabel.shadow(true).margins(Insets.top(8).withBottom(10));
         rootComponent.child(themeNameLabel);
-
 
         applyBtn = Components.label(Component.literal(""));
         setupInteractiveText(applyBtn, () -> {
@@ -90,7 +86,6 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         });
         applyBtn.margins(Insets.bottom(25));
         rootComponent.child(applyBtn);
-
 
         fpsSlider = Components.slider(Sizing.fixed(150));
         double initialProgress = (double) (BackgroundManager.targetFps - 1) / (60 - 1);
@@ -104,7 +99,6 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         });
         rootComponent.child(fpsSlider);
 
-
         backBtn = Components.label(Component.literal(""));
         setupInteractiveText(backBtn, () -> Minecraft.getInstance().setScreen(this.parent));
         backBtn.positioning(Positioning.absolute(20, this.height - 30));
@@ -114,6 +108,7 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
         this.lastLanguageCode = Minecraft.getInstance().options.languageCode;
         updateTranslations();
     }
+
     private void updateTranslations() {
         boolean isRussian = this.lastLanguageCode.equalsIgnoreCase("ru_ru");
 
@@ -181,6 +176,10 @@ public class BackgroundConfigScreen extends BaseOwoScreen<FlowLayout> {
     public void removed() {
         super.removed();
         BackgroundManager.saveConfig();
+    }
+    @Override
+    public void onClose() {
+        Minecraft.getInstance().setScreen(this.parent);
     }
 
     @Override
