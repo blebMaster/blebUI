@@ -27,7 +27,6 @@ public class BackgroundManager {
     public static List<File> themes = new ArrayList<>();
     public static int activeThemeIndex = 0;
     public static int browsingThemeIndex = 0;
-
     private static File[] animationFrames = null;
     private static int currentFrameIndex = 0;
     private static long lastFrameTime = 0;

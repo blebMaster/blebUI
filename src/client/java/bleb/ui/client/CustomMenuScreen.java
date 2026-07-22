@@ -84,7 +84,7 @@ public class CustomMenuScreen extends BaseOwoScreen<FlowLayout> {
         titleLabel.shadow(true).color(Color.ofRgb(0xaaaaaa));
         titleLabel.positioning(Positioning.absolute(12, this.height - 20));
 
-        versionLabel = Components.label(Component.literal("v1.1.0"));
+        versionLabel = Components.label(Component.literal("v1.1.1"));
         versionLabel.shadow(true).color(Color.ofRgb(0x555555));
         versionLabel.positioning(Positioning.absolute(this.width - 45, this.height - 20));
 

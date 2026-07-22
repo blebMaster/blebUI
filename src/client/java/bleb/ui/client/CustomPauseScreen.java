@@ -66,15 +66,7 @@ public class CustomPauseScreen extends BaseOwoScreen<FlowLayout> {
         boolean isSingleplayer = mc.hasSingleplayerServer();
 
         lanBtn = createCustomButton("", isSingleplayer, () -> {
-            try {
-                net.minecraft.client.gui.screens.Screen lanScreen =
-                        (net.minecraft.client.gui.screens.Screen) Class.forName("net.minecraft.client.gui.screens.ShareToLanScreen")
-                                .getConstructor(net.minecraft.client.gui.screens.Screen.class)
-                                .newInstance(this);
-                Minecraft.getInstance().setScreen(lanScreen);
-            } catch (Exception e) {
-                Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
-            }
+            Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.ShareToLanScreen(this));
         });
 
         disconnectBtn = createCustomButton("", true, () -> {
